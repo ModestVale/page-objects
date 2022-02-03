@@ -18,30 +18,24 @@ public class DashboardPage {
         heading.shouldBe(visible);
     }
 
-    public int getCardBalance(int cardNumber) {
+    public double getCardBalance(int cardNumber) {
         String balance = $$(".list__item")
                 .get(cardNumber)
                 .getText();
-        Pattern pattern = Pattern.compile("(?<=баланс:\\s)\\d+");
+        Pattern pattern = Pattern.compile("(?<=баланс:\\s)-?\\d+,?\\d{0,2}");
         Matcher matcher = pattern.matcher(balance);
 
         if (matcher.find()) {
             balance = matcher.group(0);
         }
-        return Integer.parseInt(balance);
+        return Double.parseDouble(balance);
     }
 
-    public void transferCard2Card(String sourceCardNumber, int targetCardNumber, double amount) {
+    public MoneyTransferPage transferCard2Card(int targetCardNumber) throws InterruptedException {
         $$("[data-test-id='action-deposit']")
                 .get(targetCardNumber)
                 .click();
 
-        $("h1.heading")
-                .shouldBe(visible, Duration.ofSeconds(5))
-                .shouldHave(Condition.text("Пополнение карты"));
-
-        $("[data-test-id='amount'] input").setValue(String.valueOf(amount));
-        $("[data-test-id='from'] input").setValue(String.valueOf(sourceCardNumber));
-        $("[data-test-id='action-transfer']").click();
+       return page(MoneyTransferPage.class);
     }
 }
